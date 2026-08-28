@@ -2,8 +2,11 @@ import express from "express";
 import cors from "cors";
 
 import { env } from "./config/env.js";
+
 import wordsRouter from "./routes/words.routes.js";
 import languagesRouter from "./routes/languages.routes.js";
+import authRouter from "./routes/auth.routes.js";
+import profileRoutes from "./routes/profile.routes.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -18,8 +21,11 @@ app.get("/health", (_req, res) => {
   });
 });
 
+app.use("/api/auth", authRouter);
+app.use("/api/profile", profileRoutes);
 app.use("/api/words", wordsRouter);
 app.use("/api/languages", languagesRouter);
+
 app.use(errorHandler);
 
 app.listen(env.port, () => {
