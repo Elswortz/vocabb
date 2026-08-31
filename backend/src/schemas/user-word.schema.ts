@@ -1,0 +1,14 @@
+import { z } from "zod";
+
+export const createUserWordSchema = z.object({
+  word_id: z.number().int().positive(),
+});
+
+export const userWordParamsSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
+
+export const getUserWordsQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(20),
+});
