@@ -3,41 +3,48 @@ import { AppError } from "../errors/AppError.js";
 
 export const getUserWords = async (
   userId: string,
+  search: string | undefined,
   page: number,
   limit: number,
 ) => {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  const { data, error, count } = await supabase
+  let query = supabase
     .from("user_words")
     .select(
       `
+      id,
+      created_at,
+      words!inner (
         id,
-        created_at,
-        words (
+        word,
+        pronunciation,
+        audio_url,
+        languages (
           id,
-          word,
-          pronunciation,
-          audio_url,
-          languages (
-            id,
-            code,
-            name
-          )
-        ),
-        word_progress (
-          status,
-          review_count,
-          correct_count,
-          incorrect_count,
-          last_reviewed_at,
-          next_review_at
+          code,
+          name
         )
-      `,
+      ),
+      word_progress (
+        status,
+        review_count,
+        correct_count,
+        incorrect_count,
+        last_reviewed_at,
+        next_review_at
+      )
+    `,
       { count: "exact" },
     )
-    .eq("user_id", userId)
+    .eq("user_id", userId);
+
+  if (search) {
+    query = query.ilike("words.word", `%${search}%`);
+  }
+
+  const { data, error, count } = await query
     .order("created_at", {
       ascending: false,
     })
@@ -53,33 +60,66 @@ export const getUserWords = async (
   };
 };
 
-export const getUserWordById = async (userId: string, id: number) => {
+export const getUserWordById = async (userId: string, userWordId: number) => {
   const { data, error } = await supabase
     .from("user_words")
     .select(
       `
       id,
-      word_id,
       created_at,
       words (
         id,
         word,
         pronunciation,
         audio_url,
-        language_id
+        languages (
+          id,
+          code,
+          name
+        ),
+        definitions (
+          id,
+          definition,
+          parts_of_speech (
+            id,
+            name
+          ),
+          examples (
+            id,
+            example_text,
+            translation
+          )
+        ),
+        translations (
+          id,
+          translation,
+          languages (
+            id,
+            code,
+            name
+          )
+        )
+      ),
+      word_progress (
+        status,
+        review_count,
+        correct_count,
+        incorrect_count,
+        last_reviewed_at,
+        next_review_at
       )
     `,
     )
-    .eq("id", id)
+    .eq("id", userWordId)
     .eq("user_id", userId)
-    .maybeSingle();
+    .single();
 
   if (error) {
-    throw error;
-  }
+    if (error.code === "PGRST116") {
+      throw new AppError("User word not found", 404);
+    }
 
-  if (!data) {
-    throw new AppError("User word not found", 404);
+    throw error;
   }
 
   return data;

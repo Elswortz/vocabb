@@ -10,9 +10,9 @@ import {
 export const getUserWordsController = async (_req: Request, res: Response) => {
   const userId = res.locals.user.id;
 
-  const { page, limit } = res.locals.query;
+  const { search, page, limit } = res.locals.query;
 
-  const result = await getUserWords(userId, page, limit);
+  const result = await getUserWords(userId, search, page, limit);
 
   const totalPages = Math.ceil(result.total / limit);
 
@@ -34,7 +34,7 @@ export const getUserWordByIdController = async (
   res: Response,
 ) => {
   const userId = res.locals.user.id;
-  const id = Number(res.locals.params.id);
+  const { id } = res.locals.params;
 
   const word = await getUserWordById(userId, id);
 
