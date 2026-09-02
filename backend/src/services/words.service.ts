@@ -63,18 +63,66 @@ export const getWords = async ({
   };
 };
 
-export const getWordById = async (id: number): Promise<Word | null> => {
+export const getWordById = async (id: number) => {
   const { data, error } = await supabase
     .from("words")
-    .select("*")
+    .select(
+      `
+      id,
+      word,
+      pronunciation,
+      audio_url,
+      created_at,
+      updated_at,
+
+      languages (
+        id,
+        code,
+        name
+      ),
+
+      definitions (
+        id,
+        definition,
+        created_at,
+
+        parts_of_speech (
+          id,
+          name
+        ),
+
+        examples (
+          id,
+          example_text,
+          translation,
+          created_at
+        )
+      ),
+
+      translations (
+        id,
+        translation,
+
+        languages (
+          id,
+          code,
+          name
+        )
+      )
+    `,
+    )
     .eq("id", id)
-    .maybeSingle();
+    .single();
 
   if (error) {
+    if (error.code === "PGRST116") {
+      throw new AppError("Word not found", 404);
+    }
+
     throw error;
   }
 
-  return data as Word | null;
+  return data;
 };
 
 export const createWord = async (wordData: CreateWordData): Promise<Word> => {
