@@ -11,6 +11,7 @@ import userWordsRoutes from "./routes/user-words.routes.js";
 import definitionsRouter from "./routes/definitions.routes.js";
 import examplesRouter from "./routes/examples.routes.js";
 import translationsRouter from "./routes/translations.routes.js";
+import reviewsRouter from "./routes/reviews.routes.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -33,6 +34,7 @@ app.use("/api/languages", languagesRouter);
 app.use("/api/definitions", definitionsRouter);
 app.use("/api/examples", examplesRouter);
 app.use("/api/translations", translationsRouter);
+app.use("/api/reviews", reviewsRouter);
 
 app.use(errorHandler);
 
