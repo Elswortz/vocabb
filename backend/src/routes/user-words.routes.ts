@@ -5,6 +5,7 @@ import {
   getUserWordByIdController,
   createUserWordController,
   deleteUserWordController,
+  getReviewWordsController,
 } from "../controllers/user-words.controller.js";
 
 import { authMiddleware } from "../middleware/auth.js";
@@ -14,6 +15,7 @@ import {
   createUserWordSchema,
   userWordParamsSchema,
   getUserWordsQuerySchema,
+  getReviewWordsQuerySchema,
 } from "../schemas/user-word.schema.js";
 
 const router = Router();
@@ -42,6 +44,12 @@ router.delete(
   "/:id",
   validate(userWordParamsSchema, "params"),
   deleteUserWordController,
+);
+
+router.get(
+  "/review",
+  validate(getReviewWordsQuerySchema, "query"),
+  getReviewWordsController,
 );
 
 export default router;

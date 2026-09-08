@@ -5,6 +5,7 @@ import {
   getUserWordById,
   createUserWord,
   deleteUserWord,
+  getReviewWords,
 } from "../services/user-words.service.js";
 
 export const getUserWordsController = async (_req: Request, res: Response) => {
@@ -63,4 +64,24 @@ export const deleteUserWordController = async (
   await deleteUserWord(userId, id);
 
   res.status(204).send();
+};
+
+export const getReviewWordsController = async (
+  _req: Request,
+  res: Response,
+) => {
+  const userId = res.locals.user.id;
+
+  const { limit, new_limit: newLimit } = res.locals.query;
+
+  const result = await getReviewWords(userId, limit, newLimit);
+
+  res.json({
+    data: result,
+    meta: {
+      limit,
+      newLimit,
+      total: result.length,
+    },
+  });
 };

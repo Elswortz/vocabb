@@ -15,3 +15,9 @@ export const getUserWordsQuerySchema = z.object({
 
   limit: z.coerce.number().int().positive().max(100).default(20),
 });
+
+export const getReviewWordsQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+
+  new_limit: z.coerce.number().int().min(0).max(20).default(5),
+});
