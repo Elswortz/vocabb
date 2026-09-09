@@ -167,35 +167,33 @@ export const getReviewWords = async (
 ) => {
   const now = new Date().toISOString();
 
-  const dueLimit = Math.max(limit - newLimit, 0);
-
   const { data: dueWords, error: dueError } = await supabase
     .from("user_words")
     .select(
       `
+    id,
+    created_at,
+    words!inner (
       id,
-      created_at,
-      words!inner (
+      word,
+      pronunciation,
+      audio_url,
+      languages (
         id,
-        word,
-        pronunciation,
-        audio_url,
-        languages (
-          id,
-          code,
-          name
-        )
-      ),
-      word_progress!inner (
-        status,
-        learning_step,
-        review_count,
-        correct_count,
-        incorrect_count,
-        last_reviewed_at,
-        next_review_at
+        code,
+        name
       )
-    `,
+    ),
+    word_progress!inner (
+      status,
+      learning_step,
+      review_count,
+      correct_count,
+      incorrect_count,
+      last_reviewed_at,
+      next_review_at
+    )
+  `,
     )
     .eq("user_id", userId)
     .lte("word_progress.next_review_at", now)
@@ -203,52 +201,54 @@ export const getReviewWords = async (
       foreignTable: "word_progress",
       ascending: true,
     })
-    .limit(dueLimit);
+    .limit(limit);
 
   if (dueError) {
     throw dueError;
   }
 
+  const remainingLimit = limit - (dueWords?.length ?? 0);
+
+  const newWordsLimit = Math.min(newLimit, remainingLimit);
+
   const { data: newWords, error: newError } = await supabase
     .from("user_words")
     .select(
       `
+    id,
+    created_at,
+    words!inner (
       id,
-      created_at,
-      words!inner (
+      word,
+      pronunciation,
+      audio_url,
+      languages (
         id,
-        word,
-        pronunciation,
-        audio_url,
-        languages (
-          id,
-          code,
-          name
-        )
-      ),
-      word_progress (
-        status,
-        learning_step,
-        review_count,
-        correct_count,
-        incorrect_count,
-        last_reviewed_at,
-        next_review_at
+        code,
+        name
       )
-    `,
+    ),
+    word_progress (
+      status,
+      learning_step,
+      review_count,
+      correct_count,
+      incorrect_count,
+      last_reviewed_at,
+      next_review_at
+    )
+  `,
     )
     .eq("user_id", userId)
     .is("word_progress", null)
     .order("created_at", {
       ascending: true,
     })
-    .limit(newLimit);
+    .limit(newWordsLimit);
 
   if (newError) {
     throw newError;
   }
 
-  const result = [...(dueWords ?? []), ...(newWords ?? [])].slice(0, limit);
-
-  return result;
+  return [...(dueWords ?? []), ...(newWords ?? [])];
 };

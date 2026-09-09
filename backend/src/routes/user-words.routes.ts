@@ -29,6 +29,12 @@ router.get(
 );
 
 router.get(
+  "/review",
+  validate(getReviewWordsQuerySchema, "query"),
+  getReviewWordsController,
+);
+
+router.get(
   "/:id",
   validate(userWordParamsSchema, "params"),
   getUserWordByIdController,
@@ -44,12 +50,6 @@ router.delete(
   "/:id",
   validate(userWordParamsSchema, "params"),
   deleteUserWordController,
-);
-
-router.get(
-  "/review",
-  validate(getReviewWordsQuerySchema, "query"),
-  getReviewWordsController,
 );
 
 export default router;
