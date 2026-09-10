@@ -17,6 +17,24 @@ export const collectionParamsSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
 
+export const collectionWordParamsSchema = z.object({
+  id: z.coerce.number().int().positive(),
+  wordId: z.coerce.number().int().positive(),
+});
+
 export const addCollectionWordSchema = z.object({
   word_id: z.coerce.number().int().positive(),
 });
+
+export const getCollectionWordsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+export const updateCollectionSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100).optional(),
+  description: z.string().trim().max(500).nullable().optional(),
+});
+
+export type UpdateCollectionInput = z.infer<typeof updateCollectionSchema>;

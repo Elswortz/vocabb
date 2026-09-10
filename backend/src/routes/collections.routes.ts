@@ -4,6 +4,10 @@ import {
   getCollectionsController,
   getCollectionByIdController,
   addWordToCollectionController,
+  getCollectionWordsController,
+  removeWordFromCollectionController,
+  updateCollectionController,
+  deleteCollectionController,
 } from "../controllers/collections.controller.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
@@ -12,6 +16,9 @@ import {
   getCollectionsQuerySchema,
   collectionParamsSchema,
   addCollectionWordSchema,
+  getCollectionWordsQuerySchema,
+  collectionWordParamsSchema,
+  updateCollectionSchema,
 } from "../schemas/collections.schema.js";
 
 const router = Router();
@@ -31,10 +38,11 @@ router.get(
 );
 
 router.get(
-  "/:id",
+  "/:id/words",
   authMiddleware,
   validate(collectionParamsSchema, "params"),
-  getCollectionByIdController,
+  validate(getCollectionWordsQuerySchema, "query"),
+  getCollectionWordsController,
 );
 
 router.post(
@@ -43,6 +51,35 @@ router.post(
   validate(collectionParamsSchema, "params"),
   validate(addCollectionWordSchema, "body"),
   addWordToCollectionController,
+);
+
+router.delete(
+  "/:id/words/:wordId",
+  authMiddleware,
+  validate(collectionWordParamsSchema, "params"),
+  removeWordFromCollectionController,
+);
+
+router.get(
+  "/:id",
+  authMiddleware,
+  validate(collectionParamsSchema, "params"),
+  getCollectionByIdController,
+);
+
+router.patch(
+  "/:id",
+  authMiddleware,
+  validate(collectionParamsSchema, "params"),
+  validate(updateCollectionSchema, "body"),
+  updateCollectionController,
+);
+
+router.delete(
+  "/:id",
+  authMiddleware,
+  validate(collectionParamsSchema, "params"),
+  deleteCollectionController,
 );
 
 export default router;
