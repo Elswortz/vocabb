@@ -59,11 +59,11 @@ export const deleteUserWordController = async (
   res: Response,
 ) => {
   const userId = res.locals.user.id;
-  const id = Number(res.locals.params.id);
+  const { id: userWordId } = res.locals.params;
 
-  await deleteUserWord(userId, id);
+  const result = await deleteUserWord(userId, userWordId);
 
-  res.status(204).send();
+  res.json(result);
 };
 
 export const getReviewWordsController = async (

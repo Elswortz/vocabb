@@ -142,22 +142,34 @@ export const createUserWord = async (userId: string, wordId: number) => {
   return data;
 };
 
-export const deleteUserWord = async (userId: string, id: number) => {
-  const { data, error } = await supabase
+export const deleteUserWord = async (userId: string, userWordId: number) => {
+  const { data: userWord, error: userWordError } = await supabase
+    .from("user_words")
+    .select("id")
+    .eq("id", userWordId)
+    .eq("user_id", userId)
+    .single();
+
+  if (userWordError) {
+    if (userWordError.code === "PGRST116") {
+      throw new AppError("User word not found", 404);
+    }
+
+    throw userWordError;
+  }
+
+  const { error } = await supabase
     .from("user_words")
     .delete()
-    .eq("id", id)
-    .eq("user_id", userId)
-    .select("id")
-    .maybeSingle();
+    .eq("id", userWord.id);
 
   if (error) {
     throw error;
   }
 
-  if (!data) {
-    throw new AppError("User word not found", 404);
-  }
+  return {
+    message: "User word deleted successfully",
+  };
 };
 
 export const getReviewWords = async (
