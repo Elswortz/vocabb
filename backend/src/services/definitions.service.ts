@@ -1,4 +1,4 @@
-import { supabase } from "../db/supabase.js";
+import { supabase, supabaseAdmin } from "../db/supabase.js";
 import { AppError } from "../errors/AppError.js";
 
 export const createDefinition = async (
@@ -6,7 +6,7 @@ export const createDefinition = async (
   partOfSpeechId: number,
   definition: string,
 ) => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("definitions")
     .insert({
       word_id: wordId,

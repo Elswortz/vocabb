@@ -125,9 +125,8 @@ export const getUserWordById = async (userId: string, userWordId: number) => {
   return data;
 };
 
-export const createUserWord = async (userId: string, wordId: number) => {
+export const createUserWord = async (wordId: number) => {
   const { data, error } = await supabase.rpc("add_user_word", {
-    p_user_id: userId,
     p_word_id: wordId,
   });
 

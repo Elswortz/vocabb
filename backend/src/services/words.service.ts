@@ -1,4 +1,4 @@
-import { supabase } from "../db/supabase.js";
+import { supabase, supabaseAdmin } from "../db/supabase.js";
 import type { Word } from "../types/word.js";
 import { AppError } from "../errors/AppError.js";
 
@@ -126,7 +126,7 @@ export const getWordById = async (id: number) => {
 };
 
 export const createWord = async (wordData: CreateWordData): Promise<Word> => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("words")
     .insert(wordData)
     .select()
@@ -147,7 +147,7 @@ export const updateWord = async (
   id: number,
   wordData: UpdateWordData,
 ): Promise<Word> => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("words")
     .update(wordData)
     .eq("id", id)
@@ -170,7 +170,7 @@ export const updateWord = async (
 };
 
 export const deleteWord = async (id: number): Promise<void> => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("words")
     .delete()
     .eq("id", id)

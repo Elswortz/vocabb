@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import { AppError } from "../errors/AppError.js";
 
 import {
   getWordById,
@@ -39,12 +38,8 @@ export const getWordsController = async (_req: Request, res: Response) => {
   });
 };
 
-export const getWordByIdController = async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-
-  if (!Number.isInteger(id)) {
-    throw new AppError("Invalid word id", 400);
-  }
+export const getWordByIdController = async (_req: Request, res: Response) => {
+  const { id } = res.locals.params;
 
   const word = await getWordById(id);
 

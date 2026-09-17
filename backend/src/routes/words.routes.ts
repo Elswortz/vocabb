@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { authMiddleware } from "../middleware/auth.js";
 
 import {
   createWordController,
@@ -22,10 +23,16 @@ router.get("/", validate(getWordsQuerySchema, "query"), getWordsController);
 
 router.get("/:id", validate(wordParamsSchema, "params"), getWordByIdController);
 
-router.post("/", validate(createWordSchema, "body"), createWordController);
+router.post(
+  "/",
+  authMiddleware,
+  validate(createWordSchema, "body"),
+  createWordController,
+);
 
 router.patch(
   "/:id",
+  authMiddleware,
   validate(wordParamsSchema, "params"),
   validate(updateWordSchema, "body"),
   updateWordController,
@@ -33,6 +40,7 @@ router.patch(
 
 router.delete(
   "/:id",
+  authMiddleware,
   validate(wordParamsSchema, "params"),
   deleteWordController,
 );

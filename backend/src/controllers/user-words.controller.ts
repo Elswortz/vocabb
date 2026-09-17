@@ -46,10 +46,9 @@ export const createUserWordController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
   const { word_id: wordId } = res.locals.body;
 
-  const word = await createUserWord(userId, wordId);
+  const word = await createUserWord(wordId);
 
   res.status(201).json(word);
 };

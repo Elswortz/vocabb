@@ -1,11 +1,11 @@
-import { supabase } from "../db/supabase.js";
+import { supabaseAdmin } from "../db/supabase.js";
 
 export const createExample = async (
   definitionId: number,
   exampleText: string,
   translation?: string,
 ) => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("examples")
     .insert({
       definition_id: definitionId,
