@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "../db/supabase.js";
+import { AppError } from "../errors/AppError.js";
 
 export const createExample = async (
   definitionId: number,
@@ -24,6 +25,10 @@ export const createExample = async (
     .single();
 
   if (error) {
+    if (error.code === "23503") {
+      throw new AppError("Definition not found", 404);
+    }
+
     throw error;
   }
 

@@ -135,13 +135,20 @@ export const createUserWord = async (wordId: number) => {
       throw new AppError("Word already exists in your vocabulary", 409);
     }
 
+    if (error.code === "23503") {
+      throw new AppError("Word not found", 404);
+    }
+
     throw error;
   }
 
   return data;
 };
 
-export const deleteUserWord = async (userId: string, userWordId: number) => {
+export const deleteUserWord = async (
+  userId: string,
+  userWordId: number,
+): Promise<void> => {
   const { data: userWord, error: userWordError } = await supabase
     .from("user_words")
     .select("id")
@@ -165,10 +172,6 @@ export const deleteUserWord = async (userId: string, userWordId: number) => {
   if (error) {
     throw error;
   }
-
-  return {
-    message: "User word deleted successfully",
-  };
 };
 
 export const getReviewWords = async (

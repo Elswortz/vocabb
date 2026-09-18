@@ -137,6 +137,10 @@ export const createWord = async (wordData: CreateWordData): Promise<Word> => {
       throw new AppError("Word already exists for this language", 409);
     }
 
+    if (error.code === "23503") {
+      throw new AppError("Language not found", 404);
+    }
+
     throw error;
   }
 
@@ -157,6 +161,10 @@ export const updateWord = async (
   if (error) {
     if (error.code === "23505") {
       throw new AppError("Word already exists for this language", 409);
+    }
+
+    if (error.code === "23503") {
+      throw new AppError("Language not found", 404);
     }
 
     throw error;

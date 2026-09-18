@@ -1,4 +1,4 @@
-import { supabase, supabaseAdmin } from "../db/supabase.js";
+import { supabaseAdmin } from "../db/supabase.js";
 import { AppError } from "../errors/AppError.js";
 
 export const createDefinition = async (
@@ -29,6 +29,10 @@ export const createDefinition = async (
     .single();
 
   if (error) {
+    if (error.code === "23503") {
+      throw new AppError("Word or part of speech not found", 404);
+    }
+
     throw error;
   }
 

@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+
 import {
   createCollection,
   getCollections,
@@ -15,12 +16,11 @@ export const createCollectionController = async (
   res: Response,
 ) => {
   const userId = res.locals.user.id;
-
   const { name, description } = res.locals.body;
 
-  const result = await createCollection(userId, name, description);
+  const collection = await createCollection(userId, name, description);
 
-  res.status(201).json(result);
+  res.status(201).json(collection);
 };
 
 export const getCollectionsController = async (
@@ -28,12 +28,23 @@ export const getCollectionsController = async (
   res: Response,
 ) => {
   const userId = res.locals.user.id;
-
   const { page, limit } = res.locals.query;
 
   const result = await getCollections(userId, page, limit);
 
-  res.json(result);
+  const totalPages = Math.ceil(result.total / limit);
+
+  res.json({
+    data: result.data,
+    meta: {
+      page,
+      limit,
+      total: result.total,
+      totalPages,
+      hasNext: page < totalPages,
+      hasPrevious: page > 1,
+    },
+  });
 };
 
 export const getCollectionByIdController = async (
@@ -53,13 +64,16 @@ export const addWordToCollectionController = async (
   res: Response,
 ) => {
   const userId = res.locals.user.id;
-
   const { id: collectionId } = res.locals.params;
   const { word_id: wordId } = res.locals.body;
 
-  const result = await addWordToCollection(userId, collectionId, wordId);
+  const collectionWord = await addWordToCollection(
+    userId,
+    collectionId,
+    wordId,
+  );
 
-  res.status(201).json(result);
+  res.status(201).json(collectionWord);
 };
 
 export const getCollectionWordsController = async (
@@ -67,14 +81,24 @@ export const getCollectionWordsController = async (
   res: Response,
 ) => {
   const userId = res.locals.user.id;
-
   const { id: collectionId } = res.locals.params;
-
   const { page, limit } = res.locals.query;
 
   const result = await getCollectionWords(userId, collectionId, page, limit);
 
-  res.json(result);
+  const totalPages = Math.ceil(result.total / limit);
+
+  res.json({
+    data: result.data,
+    meta: {
+      page,
+      limit,
+      total: result.total,
+      totalPages,
+      hasNext: page < totalPages,
+      hasPrevious: page > 1,
+    },
+  });
 };
 
 export const removeWordFromCollectionController = async (
@@ -82,12 +106,11 @@ export const removeWordFromCollectionController = async (
   res: Response,
 ) => {
   const userId = res.locals.user.id;
-
   const { id: collectionId, wordId } = res.locals.params;
 
-  const result = await removeWordFromCollection(userId, collectionId, wordId);
+  await removeWordFromCollection(userId, collectionId, wordId);
 
-  res.json(result);
+  res.status(204).send();
 };
 
 export const updateCollectionController = async (
@@ -95,13 +118,15 @@ export const updateCollectionController = async (
   res: Response,
 ) => {
   const userId = res.locals.user.id;
-
   const { id: collectionId } = res.locals.params;
-  const data = res.locals.body;
 
-  const result = await updateCollection(userId, collectionId, data);
+  const collection = await updateCollection(
+    userId,
+    collectionId,
+    res.locals.body,
+  );
 
-  res.json(result);
+  res.json(collection);
 };
 
 export const deleteCollectionController = async (
@@ -111,7 +136,7 @@ export const deleteCollectionController = async (
   const userId = res.locals.user.id;
   const { id: collectionId } = res.locals.params;
 
-  const result = await deleteCollection(userId, collectionId);
+  await deleteCollection(userId, collectionId);
 
-  res.json(result);
+  res.status(204).send();
 };

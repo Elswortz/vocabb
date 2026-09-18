@@ -1,9 +1,7 @@
 import { supabase } from "../db/supabase.js";
 
-export const getStats = async (userId: string) => {
-  const { data, error } = await supabase.rpc("get_user_stats", {
-    p_user_id: userId,
-  });
+export const getStats = async () => {
+  const { data, error } = await supabase.rpc("get_user_stats");
 
   if (error) {
     throw error;
@@ -12,9 +10,8 @@ export const getStats = async (userId: string) => {
   return data?.[0] ?? null;
 };
 
-export const getUserActivity = async (userId: string, days: number) => {
+export const getUserActivity = async (days: number) => {
   const { data, error } = await supabase.rpc("get_user_activity", {
-    p_user_id: userId,
     p_days: days,
   });
 
@@ -25,9 +22,8 @@ export const getUserActivity = async (userId: string, days: number) => {
   return data ?? [];
 };
 
-export const getUserStreak = async (userId: string, dailyGoal: number = 20) => {
+export const getUserStreak = async (dailyGoal: number = 20) => {
   const { data, error } = await supabase.rpc("get_user_streak", {
-    p_user_id: userId,
     p_daily_goal: dailyGoal,
   });
 

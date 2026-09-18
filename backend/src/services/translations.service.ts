@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "../db/supabase.js";
+import { AppError } from "../errors/AppError.js";
 
 export const createTranslation = async (
   wordId: number,
@@ -28,6 +29,14 @@ export const createTranslation = async (
     .single();
 
   if (error) {
+    if (error.code === "23503") {
+      throw new AppError("Word or language not found", 404);
+    }
+
+    if (error.code === "23505") {
+      throw new AppError("Translation already exists", 409);
+    }
+
     throw error;
   }
 

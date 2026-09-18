@@ -1,5 +1,7 @@
 import { supabase } from "../db/supabase.js";
 import { AppError } from "../errors/AppError.js";
+import { mapAuthError } from "../errors/mapAuthError.js";
+
 import type {
   AuthResponse,
   AuthSession,
@@ -65,7 +67,7 @@ export const registerUser = async ({
   });
 
   if (error) {
-    throw error;
+    throw mapAuthError(error);
   }
 
   if (!data.user) {
@@ -88,7 +90,7 @@ export const loginUser = async ({
   });
 
   if (error) {
-    throw error;
+    throw mapAuthError(error);
   }
 
   if (!data.user) {

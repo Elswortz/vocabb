@@ -11,8 +11,6 @@ export const reviewWord = async (data: CreateReviewInput) => {
   });
 
   if (error) {
-    console.error(error);
-
     if (error.message === "User word not found") {
       throw new AppError("User word not found", 404);
     }

@@ -26,6 +26,10 @@ export const createCollection = async (
     .single();
 
   if (error) {
+    if (error.code === "23505") {
+      throw new AppError("Collection with this name already exists", 409);
+    }
+
     throw error;
   }
 
@@ -61,19 +65,9 @@ export const getCollections = async (
     throw error;
   }
 
-  const total = count ?? 0;
-  const totalPages = Math.ceil(total / limit);
-
   return {
     data,
-    meta: {
-      page,
-      limit,
-      total,
-      totalPages,
-      hasNext: page < totalPages,
-      hasPrevious: page > 1,
-    },
+    total: count ?? 0,
   };
 };
 
@@ -221,19 +215,9 @@ export const getCollectionWords = async (
     throw error;
   }
 
-  const total = count ?? 0;
-  const totalPages = Math.ceil(total / limit);
-
   return {
     data,
-    meta: {
-      page,
-      limit,
-      total,
-      totalPages,
-      hasNext: page < totalPages,
-      hasPrevious: page > 1,
-    },
+    total: count ?? 0,
   };
 };
 
@@ -241,7 +225,7 @@ export const removeWordFromCollection = async (
   userId: string,
   collectionId: number,
   wordId: number,
-) => {
+): Promise<void> => {
   const { data: collection, error: collectionError } = await supabase
     .from("collections")
     .select("id")
@@ -272,10 +256,6 @@ export const removeWordFromCollection = async (
   if (!data) {
     throw new AppError("Word not found in collection", 404);
   }
-
-  return {
-    message: "Word removed from collection",
-  };
 };
 
 export const updateCollection = async (
@@ -322,6 +302,10 @@ export const updateCollection = async (
     .single();
 
   if (error) {
+    if (error.code === "23505") {
+      throw new AppError("Collection with this name already exists", 409);
+    }
+
     throw error;
   }
 
@@ -331,7 +315,7 @@ export const updateCollection = async (
 export const deleteCollection = async (
   userId: string,
   collectionId: number,
-) => {
+): Promise<void> => {
   const { data: collection, error: collectionError } = await supabase
     .from("collections")
     .select("id")
@@ -355,8 +339,4 @@ export const deleteCollection = async (
   if (error) {
     throw error;
   }
-
-  return {
-    message: "Collection deleted successfully",
-  };
 };

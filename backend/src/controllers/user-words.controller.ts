@@ -60,9 +60,9 @@ export const deleteUserWordController = async (
   const userId = res.locals.user.id;
   const { id: userWordId } = res.locals.params;
 
-  const result = await deleteUserWord(userId, userWordId);
+  await deleteUserWord(userId, userWordId);
 
-  res.json(result);
+  res.status(204).send();
 };
 
 export const getReviewWordsController = async (

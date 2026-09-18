@@ -1,4 +1,6 @@
 import { supabase } from "../db/supabase.js";
+import { AppError } from "../errors/AppError.js";
+
 import type { Profile } from "../types/profile.types.js";
 
 interface UpdateProfileData {
@@ -15,6 +17,10 @@ export const getProfile = async (userId: string): Promise<Profile> => {
     .single();
 
   if (error) {
+    if (error.code === "PGRST116") {
+      throw new AppError("Profile not found", 404);
+    }
+
     throw error;
   }
 
@@ -33,6 +39,14 @@ export const updateProfile = async (
     .single();
 
   if (error) {
+    if (error.code === "23505") {
+      throw new AppError("Username already exists", 409);
+    }
+
+    if (error.code === "PGRST116") {
+      throw new AppError("Profile not found", 404);
+    }
+
     throw error;
   }
 
