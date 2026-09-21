@@ -23,6 +23,14 @@ export const reviewWord = async (data: CreateReviewInput) => {
       throw new AppError("Response time cannot be negative", 400);
     }
 
+    if (error.message === "Review result is required") {
+      throw new AppError("Review result is required", 400);
+    }
+
+    if (error.message === "Response time is too large") {
+      throw new AppError("Response time is too large", 400);
+    }
+
     throw new AppError("Failed to review word", 500);
   }
 

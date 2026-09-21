@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { supabase } from "../db/supabase.js";
+import { supabase, createUserSupabaseClient } from "../db/supabase.js";
 
 export const authMiddleware = async (
   req: Request,
@@ -42,6 +42,7 @@ export const authMiddleware = async (
 
     res.locals.user = user;
     res.locals.accessToken = token;
+    res.locals.supabase = createUserSupabaseClient(token);
 
     next();
   } catch (error) {

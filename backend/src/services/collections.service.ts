@@ -316,27 +316,19 @@ export const deleteCollection = async (
   userId: string,
   collectionId: number,
 ): Promise<void> => {
-  const { data: collection, error: collectionError } = await supabase
-    .from("collections")
-    .select("id")
-    .eq("id", collectionId)
-    .eq("user_id", userId)
-    .single();
-
-  if (collectionError) {
-    if (collectionError.code === "PGRST116") {
-      throw new AppError("Collection not found", 404);
-    }
-
-    throw collectionError;
-  }
-
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("collections")
     .delete()
-    .eq("id", collection.id);
+    .eq("id", collectionId)
+    .eq("user_id", userId)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     throw error;
+  }
+
+  if (!data) {
+    throw new AppError("Collection not found", 404);
   }
 };

@@ -7,13 +7,13 @@ import {
   deleteUserWord,
   getReviewWords,
 } from "../services/user-words.service.js";
+import { getAuthContext } from "../utils/getAuthContext.js";
 
 export const getUserWordsController = async (_req: Request, res: Response) => {
-  const userId = res.locals.user.id;
-
+  const { user, client } = getAuthContext(res);
   const { search, page, limit } = res.locals.query;
 
-  const result = await getUserWords(userId, search, page, limit);
+  const result = await getUserWords(client, user.id, search, page, limit);
 
   const totalPages = Math.ceil(result.total / limit);
 
@@ -34,10 +34,10 @@ export const getUserWordByIdController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
+  const { user, client } = getAuthContext(res);
   const { id } = res.locals.params;
 
-  const word = await getUserWordById(userId, id);
+  const word = await getUserWordById(client, user.id, id);
 
   res.json(word);
 };
@@ -46,9 +46,10 @@ export const createUserWordController = async (
   _req: Request,
   res: Response,
 ) => {
+  const { client } = getAuthContext(res);
   const { word_id: wordId } = res.locals.body;
 
-  const word = await createUserWord(wordId);
+  const word = await createUserWord(client, wordId);
 
   res.status(201).json(word);
 };
@@ -57,10 +58,10 @@ export const deleteUserWordController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
+  const { user, client } = getAuthContext(res);
   const { id: userWordId } = res.locals.params;
 
-  await deleteUserWord(userId, userWordId);
+  await deleteUserWord(client, user.id, userWordId);
 
   res.status(204).send();
 };
@@ -69,11 +70,10 @@ export const getReviewWordsController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
-
+  const { user, client } = getAuthContext(res);
   const { limit, new_limit: newLimit } = res.locals.query;
 
-  const result = await getReviewWords(userId, limit, newLimit);
+  const result = await getReviewWords(client, user.id, limit, newLimit);
 
   res.json({
     data: result,

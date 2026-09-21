@@ -1,7 +1,9 @@
-import { supabase } from "../db/supabase.js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { AppError } from "../errors/AppError.js";
 
 export const getUserWords = async (
+  client: SupabaseClient,
   userId: string,
   search: string | undefined,
   page: number,
@@ -10,7 +12,7 @@ export const getUserWords = async (
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  let query = supabase
+  let query = client
     .from("user_words")
     .select(
       `
@@ -60,8 +62,12 @@ export const getUserWords = async (
   };
 };
 
-export const getUserWordById = async (userId: string, userWordId: number) => {
-  const { data, error } = await supabase
+export const getUserWordById = async (
+  client: SupabaseClient,
+  userId: string,
+  userWordId: number,
+) => {
+  const { data, error } = await client
     .from("user_words")
     .select(
       `
@@ -125,8 +131,11 @@ export const getUserWordById = async (userId: string, userWordId: number) => {
   return data;
 };
 
-export const createUserWord = async (wordId: number) => {
-  const { data, error } = await supabase.rpc("add_user_word", {
+export const createUserWord = async (
+  client: SupabaseClient,
+  wordId: number,
+) => {
+  const { data, error } = await client.rpc("add_user_word", {
     p_word_id: wordId,
   });
 
@@ -146,68 +155,62 @@ export const createUserWord = async (wordId: number) => {
 };
 
 export const deleteUserWord = async (
+  client: SupabaseClient,
   userId: string,
   userWordId: number,
 ): Promise<void> => {
-  const { data: userWord, error: userWordError } = await supabase
-    .from("user_words")
-    .select("id")
-    .eq("id", userWordId)
-    .eq("user_id", userId)
-    .single();
-
-  if (userWordError) {
-    if (userWordError.code === "PGRST116") {
-      throw new AppError("User word not found", 404);
-    }
-
-    throw userWordError;
-  }
-
-  const { error } = await supabase
+  const { data, error } = await client
     .from("user_words")
     .delete()
-    .eq("id", userWord.id);
+    .eq("id", userWordId)
+    .eq("user_id", userId)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     throw error;
   }
+
+  if (!data) {
+    throw new AppError("User word not found", 404);
+  }
 };
 
 export const getReviewWords = async (
+  client: SupabaseClient,
   userId: string,
   limit: number,
   newLimit: number,
 ) => {
   const now = new Date().toISOString();
 
-  const { data: dueWords, error: dueError } = await supabase
+  const { data: dueWords, error: dueError } = await client
     .from("user_words")
     .select(
       `
-    id,
-    created_at,
-    words!inner (
       id,
-      word,
-      pronunciation,
-      audio_url,
-      languages (
+      created_at,
+      words!inner (
         id,
-        code,
-        name
+        word,
+        pronunciation,
+        audio_url,
+        languages (
+          id,
+          code,
+          name
+        )
+      ),
+      word_progress!inner (
+        status,
+        learning_step,
+        review_count,
+        correct_count,
+        incorrect_count,
+        last_reviewed_at,
+        next_review_at
       )
-    ),
-    word_progress!inner (
-      status,
-      learning_step,
-      review_count,
-      correct_count,
-      incorrect_count,
-      last_reviewed_at,
-      next_review_at
-    )
-  `,
+    `,
     )
     .eq("user_id", userId)
     .lte("word_progress.next_review_at", now)
@@ -222,36 +225,39 @@ export const getReviewWords = async (
   }
 
   const remainingLimit = limit - (dueWords?.length ?? 0);
-
   const newWordsLimit = Math.min(newLimit, remainingLimit);
 
-  const { data: newWords, error: newError } = await supabase
+  if (newWordsLimit === 0) {
+    return dueWords ?? [];
+  }
+
+  const { data: newWords, error: newError } = await client
     .from("user_words")
     .select(
       `
-    id,
-    created_at,
-    words!inner (
       id,
-      word,
-      pronunciation,
-      audio_url,
-      languages (
+      created_at,
+      words!inner (
         id,
-        code,
-        name
+        word,
+        pronunciation,
+        audio_url,
+        languages (
+          id,
+          code,
+          name
+        )
+      ),
+      word_progress (
+        status,
+        learning_step,
+        review_count,
+        correct_count,
+        incorrect_count,
+        last_reviewed_at,
+        next_review_at
       )
-    ),
-    word_progress (
-      status,
-      learning_step,
-      review_count,
-      correct_count,
-      incorrect_count,
-      last_reviewed_at,
-      next_review_at
-    )
-  `,
+    `,
     )
     .eq("user_id", userId)
     .is("word_progress", null)
