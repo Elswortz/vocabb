@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.js";
+import { requireAdmin } from "../middleware/requireAdmin.js";
 
 import {
   createWordController,
@@ -26,6 +27,7 @@ router.get("/:id", validate(wordParamsSchema, "params"), getWordByIdController);
 router.post(
   "/",
   authMiddleware,
+  requireAdmin,
   validate(createWordSchema, "body"),
   createWordController,
 );
@@ -33,6 +35,7 @@ router.post(
 router.patch(
   "/:id",
   authMiddleware,
+  requireAdmin,
   validate(wordParamsSchema, "params"),
   validate(updateWordSchema, "body"),
   updateWordController,
@@ -41,6 +44,7 @@ router.patch(
 router.delete(
   "/:id",
   authMiddleware,
+  requireAdmin,
   validate(wordParamsSchema, "params"),
   deleteWordController,
 );

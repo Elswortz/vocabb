@@ -12,7 +12,7 @@ interface UpdateProfileData {
 export const getProfile = async (userId: string): Promise<Profile> => {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url")
+    .select("id, username, display_name, avatar_url, role")
     .eq("id", userId)
     .single();
 
@@ -35,7 +35,7 @@ export const updateProfile = async (
     .from("profiles")
     .update(data)
     .eq("id", userId)
-    .select("id, username, display_name, avatar_url")
+    .select("id, username, display_name, avatar_url, role")
     .single();
 
   if (error) {
