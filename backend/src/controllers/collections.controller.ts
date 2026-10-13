@@ -11,14 +11,16 @@ import {
   deleteCollection,
 } from "../services/collections.service.js";
 
+import { getAuthContext } from "../utils/getAuthContext.js";
+
 export const createCollectionController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
+  const { user, client } = getAuthContext(res);
   const { name, description } = res.locals.body;
 
-  const collection = await createCollection(userId, name, description);
+  const collection = await createCollection(client, user.id, name, description);
 
   res.status(201).json(collection);
 };
@@ -27,10 +29,10 @@ export const getCollectionsController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
+  const { user, client } = getAuthContext(res);
   const { page, limit } = res.locals.query;
 
-  const result = await getCollections(userId, page, limit);
+  const result = await getCollections(client, user.id, page, limit);
 
   const totalPages = Math.ceil(result.total / limit);
 
@@ -51,10 +53,10 @@ export const getCollectionByIdController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
+  const { user, client } = getAuthContext(res);
   const { id } = res.locals.params;
 
-  const collection = await getCollectionById(userId, id);
+  const collection = await getCollectionById(client, user.id, id);
 
   res.json(collection);
 };
@@ -63,12 +65,13 @@ export const addWordToCollectionController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
+  const { user, client } = getAuthContext(res);
   const { id: collectionId } = res.locals.params;
   const { word_id: wordId } = res.locals.body;
 
   const collectionWord = await addWordToCollection(
-    userId,
+    client,
+    user.id,
     collectionId,
     wordId,
   );
@@ -80,11 +83,17 @@ export const getCollectionWordsController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
+  const { user, client } = getAuthContext(res);
   const { id: collectionId } = res.locals.params;
   const { page, limit } = res.locals.query;
 
-  const result = await getCollectionWords(userId, collectionId, page, limit);
+  const result = await getCollectionWords(
+    client,
+    user.id,
+    collectionId,
+    page,
+    limit,
+  );
 
   const totalPages = Math.ceil(result.total / limit);
 
@@ -105,10 +114,10 @@ export const removeWordFromCollectionController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
+  const { user, client } = getAuthContext(res);
   const { id: collectionId, wordId } = res.locals.params;
 
-  await removeWordFromCollection(userId, collectionId, wordId);
+  await removeWordFromCollection(client, user.id, collectionId, wordId);
 
   res.status(204).send();
 };
@@ -117,11 +126,12 @@ export const updateCollectionController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
+  const { user, client } = getAuthContext(res);
   const { id: collectionId } = res.locals.params;
 
   const collection = await updateCollection(
-    userId,
+    client,
+    user.id,
     collectionId,
     res.locals.body,
   );
@@ -133,10 +143,10 @@ export const deleteCollectionController = async (
   _req: Request,
   res: Response,
 ) => {
-  const userId = res.locals.user.id;
+  const { user, client } = getAuthContext(res);
   const { id: collectionId } = res.locals.params;
 
-  await deleteCollection(userId, collectionId);
+  await deleteCollection(client, user.id, collectionId);
 
   res.status(204).send();
 };

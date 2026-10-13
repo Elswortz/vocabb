@@ -1,13 +1,14 @@
-import { supabase } from "../db/supabase.js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { AppError } from "../errors/AppError.js";
 import type { UpdateCollectionInput } from "../schemas/collections.schema.js";
 
 export const createCollection = async (
+  client: SupabaseClient,
   userId: string,
   name: string,
   description?: string,
 ) => {
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("collections")
     .insert({
       user_id: userId,
@@ -37,13 +38,14 @@ export const createCollection = async (
 };
 
 export const getCollections = async (
+  client: SupabaseClient,
   userId: string,
   page: number,
   limit: number,
 ) => {
   const offset = (page - 1) * limit;
 
-  const { data, error, count } = await supabase
+  const { data, error, count } = await client
     .from("collections")
     .select(
       `
@@ -72,10 +74,11 @@ export const getCollections = async (
 };
 
 export const getCollectionById = async (
+  client: SupabaseClient,
   userId: string,
   collectionId: number,
 ) => {
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("collections")
     .select(
       `
@@ -102,11 +105,12 @@ export const getCollectionById = async (
 };
 
 export const addWordToCollection = async (
+  client: SupabaseClient,
   userId: string,
   collectionId: number,
   wordId: number,
 ) => {
-  const { data: collection, error: collectionError } = await supabase
+  const { data: collection, error: collectionError } = await client
     .from("collections")
     .select("id")
     .eq("id", collectionId)
@@ -121,7 +125,7 @@ export const addWordToCollection = async (
     throw collectionError;
   }
 
-  const { data: word, error: wordError } = await supabase
+  const { data: word, error: wordError } = await client
     .from("words")
     .select("id")
     .eq("id", wordId)
@@ -135,7 +139,7 @@ export const addWordToCollection = async (
     throw wordError;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("collection_words")
     .insert({
       collection_id: collection.id,
@@ -163,6 +167,7 @@ export const addWordToCollection = async (
 };
 
 export const getCollectionWords = async (
+  client: SupabaseClient,
   userId: string,
   collectionId: number,
   page: number,
@@ -170,7 +175,7 @@ export const getCollectionWords = async (
 ) => {
   const offset = (page - 1) * limit;
 
-  const { data: collection, error: collectionError } = await supabase
+  const { data: collection, error: collectionError } = await client
     .from("collections")
     .select("id")
     .eq("id", collectionId)
@@ -185,7 +190,7 @@ export const getCollectionWords = async (
     throw collectionError;
   }
 
-  const { data, error, count } = await supabase
+  const { data, error, count } = await client
     .from("collection_words")
     .select(
       `
@@ -222,11 +227,12 @@ export const getCollectionWords = async (
 };
 
 export const removeWordFromCollection = async (
+  client: SupabaseClient,
   userId: string,
   collectionId: number,
   wordId: number,
 ): Promise<void> => {
-  const { data: collection, error: collectionError } = await supabase
+  const { data: collection, error: collectionError } = await client
     .from("collections")
     .select("id")
     .eq("id", collectionId)
@@ -241,7 +247,7 @@ export const removeWordFromCollection = async (
     throw collectionError;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("collection_words")
     .delete()
     .eq("collection_id", collection.id)
@@ -259,11 +265,12 @@ export const removeWordFromCollection = async (
 };
 
 export const updateCollection = async (
+  client: SupabaseClient,
   userId: string,
   collectionId: number,
   data: UpdateCollectionInput,
 ) => {
-  const { data: collection, error: collectionError } = await supabase
+  const { data: collection, error: collectionError } = await client
     .from("collections")
     .select("id")
     .eq("id", collectionId)
@@ -278,7 +285,7 @@ export const updateCollection = async (
     throw collectionError;
   }
 
-  const { data: updatedCollection, error } = await supabase
+  const { data: updatedCollection, error } = await client
     .from("collections")
     .update({
       ...(data.name !== undefined && {
@@ -313,10 +320,11 @@ export const updateCollection = async (
 };
 
 export const deleteCollection = async (
+  client: SupabaseClient,
   userId: string,
   collectionId: number,
 ): Promise<void> => {
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("collections")
     .delete()
     .eq("id", collectionId)
