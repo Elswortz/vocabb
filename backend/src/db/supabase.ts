@@ -2,12 +2,29 @@ import { createClient } from "@supabase/supabase-js";
 
 import { env } from "../config/env.js";
 
-export const supabase = createClient(env.supabaseUrl, env.supabaseKey);
+const serverAuthOptions = {
+  persistSession: false,
+  autoRefreshToken: false,
+  detectSessionInUrl: false,
+};
+
+export const supabase = createClient(env.supabaseUrl, env.supabaseKey, {
+  auth: serverAuthOptions,
+});
 
 export const supabaseAdmin = createClient(
   env.supabaseUrl,
   env.supabaseServiceRoleKey,
+  {
+    auth: serverAuthOptions,
+  },
 );
+
+export const createAuthSupabaseClient = () => {
+  return createClient(env.supabaseUrl, env.supabaseKey, {
+    auth: serverAuthOptions,
+  });
+};
 
 export const createUserSupabaseClient = (accessToken: string) => {
   return createClient(env.supabaseUrl, env.supabaseKey, {
@@ -16,10 +33,6 @@ export const createUserSupabaseClient = (accessToken: string) => {
         Authorization: `Bearer ${accessToken}`,
       },
     },
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
+    auth: serverAuthOptions,
   });
 };

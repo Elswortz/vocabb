@@ -1,4 +1,4 @@
-import { supabase } from "../db/supabase.js";
+import { supabase, createAuthSupabaseClient } from "../db/supabase.js";
 import { AppError } from "../errors/AppError.js";
 import { mapAuthError } from "../errors/mapAuthError.js";
 
@@ -55,7 +55,8 @@ export const registerUser = async ({
   username,
   display_name,
 }: RegisterData): Promise<AuthResponse> => {
-  const { data, error } = await supabase.auth.signUp({
+  const client = createAuthSupabaseClient();
+  const { data, error } = await client.auth.signUp({
     email,
     password,
     options: {
@@ -84,7 +85,8 @@ export const loginUser = async ({
   email,
   password,
 }: LoginData): Promise<AuthResponse> => {
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const client = createAuthSupabaseClient();
+  const { data, error } = await client.auth.signInWithPassword({
     email,
     password,
   });
