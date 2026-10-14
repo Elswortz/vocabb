@@ -6,8 +6,12 @@ import {
   getUserStreak,
 } from "../services/stats.service.js";
 
+import { getAuthContext } from "../utils/getAuthContext.js";
+
 export const getStatsController = async (_req: Request, res: Response) => {
-  const result = await getStats();
+  const { client } = getAuthContext(res);
+
+  const result = await getStats(client);
 
   res.json(result);
 };
@@ -16,9 +20,10 @@ export const getUserActivityController = async (
   _req: Request,
   res: Response,
 ) => {
+  const { client } = getAuthContext(res);
   const { days } = res.locals.query;
 
-  const result = await getUserActivity(days);
+  const result = await getUserActivity(client, days);
 
   res.json({
     data: result,
@@ -29,7 +34,9 @@ export const getUserActivityController = async (
 };
 
 export const getUserStreakController = async (_req: Request, res: Response) => {
-  const result = await getUserStreak();
+  const { client } = getAuthContext(res);
+
+  const result = await getUserStreak(client);
 
   res.json(result);
 };

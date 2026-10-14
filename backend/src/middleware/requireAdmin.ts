@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
-import { supabase } from "../db/supabase.js";
+
 import { AppError } from "../errors/AppError.js";
+import { getAuthContext } from "../utils/getAuthContext.js";
 
 export const requireAdmin = async (
   _req: Request,
@@ -8,13 +9,9 @@ export const requireAdmin = async (
   next: NextFunction,
 ) => {
   try {
-    const user = res.locals.user;
+    const { user, client } = getAuthContext(res);
 
-    if (!user) {
-      throw new AppError("Unauthorized", 401);
-    }
-
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await client
       .from("profiles")
       .select("role")
       .eq("id", user.id)

@@ -1,6 +1,6 @@
-import { supabase } from "../db/supabase.js";
-import { AppError } from "../errors/AppError.js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { AppError } from "../errors/AppError.js";
 import type { Profile } from "../types/profile.types.js";
 
 interface UpdateProfileData {
@@ -9,8 +9,11 @@ interface UpdateProfileData {
   avatar_url?: string | null;
 }
 
-export const getProfile = async (userId: string): Promise<Profile> => {
-  const { data, error } = await supabase
+export const getProfile = async (
+  client: SupabaseClient,
+  userId: string,
+): Promise<Profile> => {
+  const { data, error } = await client
     .from("profiles")
     .select("id, username, display_name, avatar_url, role")
     .eq("id", userId)
@@ -28,10 +31,11 @@ export const getProfile = async (userId: string): Promise<Profile> => {
 };
 
 export const updateProfile = async (
+  client: SupabaseClient,
   userId: string,
   data: UpdateProfileData,
 ): Promise<Profile> => {
-  const { data: profile, error } = await supabase
+  const { data: profile, error } = await client
     .from("profiles")
     .update(data)
     .eq("id", userId)

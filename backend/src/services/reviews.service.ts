@@ -1,9 +1,13 @@
-import { supabase } from "../db/supabase.js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { AppError } from "../errors/AppError.js";
 import type { CreateReviewInput } from "../schemas/reviews.schema.js";
 
-export const reviewWord = async (data: CreateReviewInput) => {
-  const { data: result, error } = await supabase.rpc("review_word", {
+export const reviewWord = async (
+  client: SupabaseClient,
+  data: CreateReviewInput,
+) => {
+  const { data: result, error } = await client.rpc("review_word", {
     p_user_word_id: data.user_word_id,
     p_is_correct: data.is_correct,
     p_review_type: data.review_type,
