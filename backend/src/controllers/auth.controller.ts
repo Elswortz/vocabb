@@ -6,6 +6,8 @@ import {
   getCurrentUser,
 } from "../services/auth.service.js";
 
+import { AppError } from "../errors/AppError.js";
+
 export const registerController = async (_req: Request, res: Response) => {
   const result = await registerUser(res.locals.body);
   res.status(201).json(result);
@@ -20,7 +22,13 @@ export const getCurrentUserController = async (
   _req: Request,
   res: Response,
 ) => {
-  const user = await getCurrentUser(res.locals.accessToken);
+  const token = res.locals.accessToken;
+
+  if (!token) {
+    throw new AppError("Unauthorized", 401);
+  }
+
+  const user = await getCurrentUser(token);
 
   res.json({
     user,
