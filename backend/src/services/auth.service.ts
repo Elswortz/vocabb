@@ -117,3 +117,26 @@ export const getCurrentUser = async (token: string): Promise<AuthUser> => {
 
   return formatUser(user);
 };
+
+export const refreshUser = async (
+  refreshToken: string,
+): Promise<AuthResponse> => {
+  const client = createAuthSupabaseClient();
+
+  const { data, error } = await client.auth.refreshSession({
+    refresh_token: refreshToken,
+  });
+
+  if (error) {
+    throw new AppError("Invalid or expired refresh token", 401);
+  }
+
+  if (!data.user || !data.session) {
+    throw new AppError("Failed to refresh session", 401);
+  }
+
+  return {
+    user: formatUser(data.user),
+    session: formatSession(data.session),
+  };
+};
