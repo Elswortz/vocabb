@@ -1,60 +1,51 @@
-// import { createContext, useContext, useState, type ReactNode } from "react";
-// import type { AuthUser } from "../types/auth.types";
+import { useCallback, useState, useEffect, type ReactNode } from "react";
+import { AuthContext } from "./auth-context";
+import { authEvents } from "@/shared/api/authEvents";
+import type { AuthUser } from "../types/auth.types";
+import { tokenStorage } from "@/shared/api/tokenStorage";
 
-// interface AuthContextValue {
-//   user: AuthUser | null;
-//   accessToken: string | null;
-//   isAuthenticated: boolean;
-//   isLoading: boolean;
-//   setAuth: (user: AuthUser, accessToken: string) => void;
-//   clearAuth: () => void;
-//   setIsLoading: (value: boolean) => void;
-// }
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-// export const AuthContext = createContext<AuthContextValue | null>(null);
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-// interface AuthProviderProps {
-//   children: ReactNode;
-// }
+  const setAuth = useCallback((nextUser: AuthUser, token: string) => {
+    setUser(nextUser);
+    setAccessToken(token);
+    tokenStorage.set(token);
+  }, []);
 
-// export function AuthProvider({ children }: AuthProviderProps) {
-//   const [user, setUser] = useState<AuthUser | null>(null);
-//   const [accessToken, setAccessToken] = useState<string | null>(null);
-//   const [isLoading, setIsLoading] = useState(true);
+  const clearAuth = useCallback(() => {
+    setUser(null);
+    setAccessToken(null);
+    tokenStorage.clear();
+  }, []);
 
-//   const setAuth = (nextUser: AuthUser, token: string) => {
-//     setUser(nextUser);
-//     setAccessToken(token);
-//   };
+  useEffect(() => {
+    authEvents.setHandler(clearAuth);
 
-//   const clearAuth = () => {
-//     setUser(null);
-//     setAccessToken(null);
-//   };
+    return () => {
+      authEvents.clearHandler();
+    };
+  }, [clearAuth]);
 
-//   return (
-//     <AuthContext.Provider
-//       value={{
-//         user,
-//         accessToken,
-//         isAuthenticated: Boolean(user && accessToken),
-//         isLoading,
-//         setAuth,
-//         clearAuth,
-//         setIsLoading,
-//       }}
-//     >
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// }
-
-// export function useAuth() {
-//   const context = useContext(AuthContext);
-
-//   if (!context) {
-//     throw new Error("useAuth must be used within an AuthProvider");
-//   }
-
-//   return context;
-// }
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        accessToken,
+        isAuthenticated: Boolean(user && accessToken),
+        isLoading,
+        setAuth,
+        clearAuth,
+        setIsLoading,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
