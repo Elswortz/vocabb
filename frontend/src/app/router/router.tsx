@@ -3,6 +3,8 @@ import { createBrowserRouter } from "react-router";
 import { PublicLayout } from "@/app/layouts/PublicLayout";
 import { AppLayout } from "@/app/layouts/AppLayout";
 
+import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
+
 import { HomePage } from "@/pages/HomePage/HomePage";
 import { LoginPage } from "@/pages/LoginPage/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage/RegisterPage";
@@ -29,15 +31,20 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    element: <AppLayout />,
+    element: <ProtectedRoute />,
     children: [
       {
-        path: "/dictionary",
-        element: <DictionaryPage />,
-      },
-      {
-        path: "/my-words",
-        element: <MyWordsPage />,
+        element: <AppLayout />,
+        children: [
+          {
+            path: "/dictionary",
+            element: <DictionaryPage />,
+          },
+          {
+            path: "/my-words",
+            element: <MyWordsPage />,
+          },
+        ],
       },
     ],
   },
