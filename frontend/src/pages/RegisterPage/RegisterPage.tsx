@@ -13,6 +13,8 @@ import { useNavigate } from "react-router";
 import { useRegisterForm } from "@/features/auth/hooks/useRegisterForm";
 import { useRegisterMutation } from "@/features/auth/api/auth.queries";
 
+import { getAuthErrorMessage } from "@/features/auth/utils/getAuthErrorMessage";
+
 export function RegisterPage() {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -38,9 +40,12 @@ export function RegisterPage() {
           "Registration successful. Please check your email to confirm your account.",
         );
       }
-    } catch {
+    } catch (error) {
       setServerError(
-        "Unable to create your account. Check your details and try again.",
+        getAuthErrorMessage(
+          error,
+          "Unable to create your account. Please try again.",
+        ),
       );
     }
   });

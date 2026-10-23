@@ -7,13 +7,18 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 import { useLoginForm } from "@/features/auth/hooks/useLoginForm";
 import { useLoginMutation } from "@/features/auth/api/auth.queries";
 
+import { getAuthErrorMessage } from "@/features/auth/utils/getAuthErrorMessage";
+
 export function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/dictionary";
+
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -31,15 +36,18 @@ export function LoginPage() {
       const response = await loginMutation.mutateAsync(values);
 
       if (response.session) {
-        navigate("/dictionary", { replace: true });
+        navigate(from, { replace: true });
       } else {
         setServerError(
           "No active session was returned. Please try signing in again.",
         );
       }
-    } catch {
+    } catch (error) {
       setServerError(
-        "Unable to sign in. Check your email and password, and make sure your email is confirmed.",
+        getAuthErrorMessage(
+          error,
+          "Unable to sign in. Please check your credentials and try again.",
+        ),
       );
     }
   });
