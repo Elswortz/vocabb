@@ -46,7 +46,8 @@ export function LoginPage() {
       setServerError(
         getAuthErrorMessage(
           error,
-          "Unable to sign in. Please check your credentials and try again.",
+          "login",
+          "Unable to sign in. Please try again.",
         ),
       );
     }
@@ -74,6 +75,7 @@ export function LoginPage() {
               type="email"
               autoComplete="email"
               fullWidth
+              disabled={loginMutation.isPending}
               {...register("email")}
               error={Boolean(errors.email)}
               helperText={errors.email?.message}
@@ -84,6 +86,7 @@ export function LoginPage() {
               type="password"
               autoComplete="current-password"
               fullWidth
+              disabled={loginMutation.isPending}
               {...register("password")}
               error={Boolean(errors.password)}
               helperText={errors.password?.message}
@@ -105,6 +108,7 @@ export function LoginPage() {
                 variant="text"
                 onClick={() => navigate("/register")}
                 sx={{ textTransform: "none" }}
+                disabled={loginMutation.isPending}
               >
                 Sign up
               </Button>

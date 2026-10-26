@@ -5,8 +5,11 @@ interface ApiErrorResponse {
   error?: string;
 }
 
+type AuthErrorContext = "login" | "register";
+
 export function getAuthErrorMessage(
   error: unknown,
+  context: AuthErrorContext,
   fallback = "Something went wrong. Please try again.",
 ): string {
   if (!axios.isAxiosError<ApiErrorResponse>(error)) {
@@ -18,9 +21,14 @@ export function getAuthErrorMessage(
   }
 
   const status = error.response.status;
-  const message = error.response.data?.message ?? error.response.data?.error;
 
-  if (status === 400 || status === 401) {
+  if (status === 400) {
+    return context === "login"
+      ? "Invalid email or password. Please check your credentials and try again."
+      : "Please check your registration details and try again.";
+  }
+
+  if (status === 401) {
     return "Invalid email or password. Please check your credentials and try again.";
   }
 
@@ -29,15 +37,17 @@ export function getAuthErrorMessage(
   }
 
   if (status === 409) {
-    return "An account with these details already exists.";
+    return context === "register"
+      ? "An account with this email or username already exists."
+      : "This action conflicts with the current account state.";
+  }
+
+  if (status === 429) {
+    return "Too many attempts. Please wait a moment and try again.";
   }
 
   if (status >= 500) {
     return "The server is temporarily unavailable. Please try again later.";
-  }
-
-  if (message && status >= 400) {
-    return message;
   }
 
   return fallback;

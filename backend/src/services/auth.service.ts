@@ -71,6 +71,10 @@ export const registerUser = async ({
     throw mapAuthError(error);
   }
 
+  if (data.user && data.user.identities?.length === 0) {
+    throw new AppError("An account with this email already exists", 409);
+  }
+
   if (!data.user) {
     throw new AppError("Failed to create user", 500);
   }

@@ -44,6 +44,7 @@ export function RegisterPage() {
       setServerError(
         getAuthErrorMessage(
           error,
+          "register",
           "Unable to create your account. Please try again.",
         ),
       );
@@ -76,6 +77,7 @@ export function RegisterPage() {
               type="email"
               autoComplete="email"
               fullWidth
+              disabled={registerMutation.isPending}
               {...register("email")}
               error={Boolean(errors.email)}
               helperText={errors.email?.message}
@@ -85,6 +87,7 @@ export function RegisterPage() {
               label="Username"
               autoComplete="username"
               fullWidth
+              disabled={registerMutation.isPending}
               {...register("username")}
               error={Boolean(errors.username)}
               helperText={errors.username?.message}
@@ -94,6 +97,7 @@ export function RegisterPage() {
               label="Display name"
               autoComplete="name"
               fullWidth
+              disabled={registerMutation.isPending}
               {...register("display_name")}
               error={Boolean(errors.display_name)}
               helperText={errors.display_name?.message}
@@ -104,6 +108,7 @@ export function RegisterPage() {
               type="password"
               autoComplete="new-password"
               fullWidth
+              disabled={registerMutation.isPending}
               {...register("password")}
               error={Boolean(errors.password)}
               helperText={errors.password?.message}
@@ -127,6 +132,7 @@ export function RegisterPage() {
                 variant="text"
                 onClick={() => navigate("/login")}
                 sx={{ textTransform: "none" }}
+                disabled={registerMutation.isPending}
               >
                 Sign in
               </Button>
