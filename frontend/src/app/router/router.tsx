@@ -10,6 +10,7 @@ import { HomePage } from "@/pages/HomePage/HomePage";
 import { LoginPage } from "@/pages/LoginPage/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage/RegisterPage";
 import { DictionaryPage } from "@/pages/DictionaryPage/DictionaryPage";
+import { DictionaryWordDetailsPage } from "@/pages/DictionaryWordDetailsPage/DictionaryWordDetailsPage";
 import { MyWordsPage } from "@/pages/MyWordsPage/MyWordsPage";
 import { NotFoundPage } from "@/pages/NotFoundPage/NotFoundPage";
 
@@ -49,6 +50,10 @@ export const router = createBrowserRouter([
           {
             path: "/my-words",
             element: <MyWordsPage />,
+          },
+          {
+            path: "dictionary/:wordId",
+            element: <DictionaryWordDetailsPage />,
           },
         ],
       },
