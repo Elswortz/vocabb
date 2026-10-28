@@ -1,5 +1,5 @@
 import { supabase } from "../db/supabase.js";
-import type { Language } from "../types/language.js";
+import type { Language } from "../types/language.types.js";
 
 export const getLanguages = async (): Promise<Language[]> => {
   const { data, error } = await supabase

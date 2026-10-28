@@ -41,7 +41,7 @@ export const createWordSchema = z
       .nullable()
       .optional(),
 
-    audio_url: z.string().url("Invalid audio URL").nullable().optional(),
+    audio_url: z.string().trim().url("Invalid audio URL").nullable().optional(),
 
     language_id: z.number().int().positive(),
   })

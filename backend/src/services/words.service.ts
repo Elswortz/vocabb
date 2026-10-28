@@ -1,32 +1,13 @@
 import { supabase, supabaseAdmin } from "../db/supabase.js";
-import type { Word } from "../types/word.js";
+import type {
+  CreateWordData,
+  GetWordsParams,
+  GetWordsResult,
+  UpdateWordData,
+  Word,
+  WordWithTranslation,
+} from "../types/word.types.js";
 import { AppError } from "../errors/AppError.js";
-
-interface GetWordsParams {
-  search?: string;
-  languageId?: number;
-  page: number;
-  limit: number;
-}
-
-interface GetWordsResult {
-  data: Word[];
-  total: number;
-}
-
-interface CreateWordData {
-  word: string;
-  pronunciation?: string | null;
-  audio_url?: string | null;
-  language_id: number;
-}
-
-interface UpdateWordData {
-  word?: string;
-  pronunciation?: string | null;
-  audio_url?: string | null;
-  language_id?: number;
-}
 
 export const getWords = async ({
   search,
@@ -39,7 +20,29 @@ export const getWords = async ({
 
   let query = supabase
     .from("words")
-    .select("*", { count: "exact" })
+    .select(
+      `
+      id,
+      word,
+      pronunciation,
+      audio_url,
+      language_id,
+      created_at,
+      updated_at,
+
+      translations (
+        id,
+        translation,
+
+        languages (
+          id,
+          code,
+          name
+        )
+      )
+    `,
+      { count: "exact" },
+    )
     .order("id", { ascending: true })
     .range(from, to);
 
@@ -58,7 +61,7 @@ export const getWords = async ({
   }
 
   return {
-    data: data as Word[],
+    data: data as WordWithTranslation[],
     total: count ?? 0,
   };
 };
