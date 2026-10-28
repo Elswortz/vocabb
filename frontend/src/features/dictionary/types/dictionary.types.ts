@@ -6,6 +6,11 @@ export interface DictionaryWord {
   language_id: number;
   created_at: string;
   updated_at: string;
+  translations: DictionaryTranslation[];
+}
+
+export interface DictionaryWordWithTranslation extends DictionaryWord {
+  translations: DictionaryTranslation[];
 }
 
 export interface DictionaryPagination {
@@ -18,7 +23,7 @@ export interface DictionaryPagination {
 }
 
 export interface DictionaryWordsResponse {
-  data: DictionaryWord[];
+  data: DictionaryWordWithTranslation[];
   meta: DictionaryPagination;
 }
 
@@ -65,4 +70,11 @@ export interface DictionaryWordDetails extends DictionaryWord {
   languages: DictionaryLanguage | null;
   definitions: DictionaryDefinition[];
   translations: DictionaryTranslation[];
+}
+
+export interface CreateDictionaryWordData {
+  word: string;
+  language_id: number;
+  pronunciation?: string | null;
+  audio_url?: string | null;
 }

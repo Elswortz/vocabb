@@ -7,14 +7,18 @@ import {
   Stack,
   Typography,
   Button,
+  IconButton,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router";
 import { useDictionaryWord } from "@/features/dictionary/hooks/useDictionaryWord";
+import { useSpeechSynthesis } from "@/shared/hooks/useSpeechSynthesis";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 export function DictionaryWordDetailsPage() {
   const navigate = useNavigate();
+  const { speak, isSupported, isSpeaking } = useSpeechSynthesis();
   const { wordId } = useParams<{ wordId: string }>();
   const id = Number(wordId);
 
@@ -52,9 +56,21 @@ export function DictionaryWordDetailsPage() {
         Back to Dictionary
       </Button>
       <Box>
-        <Typography variant="h3" sx={{ fontWeight: 700 }}>
-          {data.word}
-        </Typography>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+          <Typography variant="h3" sx={{ fontWeight: 700 }}>
+            {data.word}
+          </Typography>
+
+          {isSupported && (
+            <IconButton
+              aria-label={`Listen to pronunciation of ${data.word}`}
+              onClick={() => speak(data.word)}
+              color={isSpeaking ? "primary" : "default"}
+            >
+              <VolumeUpIcon />
+            </IconButton>
+          )}
+        </Stack>
 
         {data.pronunciation && (
           <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>

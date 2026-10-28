@@ -4,6 +4,8 @@ import type {
   DictionaryWordsResponse,
   GetDictionaryWordsParams,
   DictionaryWordDetails,
+  CreateDictionaryWordData,
+  DictionaryWord,
 } from "../types/dictionary.types";
 
 export const getDictionaryWords = async (
@@ -20,6 +22,14 @@ export const getDictionaryWordById = async (
   id: number,
 ): Promise<DictionaryWordDetails> => {
   const { data } = await apiClient.get<DictionaryWordDetails>(`/words/${id}`);
+
+  return data;
+};
+
+export const createDictionaryWord = async (
+  wordData: CreateDictionaryWordData,
+): Promise<DictionaryWord> => {
+  const { data } = await apiClient.post<DictionaryWord>("/words", wordData);
 
   return data;
 };
