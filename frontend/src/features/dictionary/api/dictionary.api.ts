@@ -6,7 +6,16 @@ import type {
   DictionaryWordDetails,
   CreateDictionaryWordData,
   DictionaryWord,
+  DictionaryLanguage,
 } from "../types/dictionary.types";
+
+export const getDictionaryLanguages = async (): Promise<
+  DictionaryLanguage[]
+> => {
+  const { data } = await apiClient.get<DictionaryLanguage[]>("/languages");
+
+  return data;
+};
 
 export const getDictionaryWords = async (
   params: GetDictionaryWordsParams = {},

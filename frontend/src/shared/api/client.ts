@@ -6,6 +6,7 @@ interface RefreshResponse {
   user: {
     id: string;
     email: string;
+    role: "user" | "admin";
   };
   session: {
     access_token: string;

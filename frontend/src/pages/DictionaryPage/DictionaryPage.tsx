@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   Alert,
+  Button,
   CircularProgress,
   Pagination,
   Stack,
@@ -11,12 +12,16 @@ import { useDictionaryWords } from "@/features/dictionary/hooks/useDictionaryWor
 import { useDebounce } from "@/shared/hooks/useDebounce";
 
 import { DictionaryWordCard } from "@/features/dictionary/components/DictionaryWordCard";
+import { CreateDictionaryWordDialog } from "@/features/dictionary/components/CreateDictionaryWordDialog";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export function DictionaryPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const debouncedSearch = useDebounce(search.trim());
+  const { user } = useAuth();
 
   const { data, isPending, isError, isFetching } = useDictionaryWords({
     search: debouncedSearch || undefined,
@@ -26,11 +31,26 @@ export function DictionaryPage() {
 
   return (
     <Stack spacing={3}>
-      <Stack spacing={1}>
-        <Typography variant="h4">Dictionary</Typography>
-        <Typography color="text.secondary">
-          Find English words and explore their meanings.
-        </Typography>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        sx={{ alignItems: { sm: "center" }, justifyContent: "space-between" }}
+      >
+        <Stack spacing={1}>
+          <Typography variant="h4">Dictionary</Typography>
+          <Typography color="text.secondary">
+            Find English words and explore their meanings.
+          </Typography>
+        </Stack>
+
+        {user?.role === "admin" && (
+          <Button
+            variant="contained"
+            onClick={() => setIsCreateDialogOpen(true)}
+          >
+            Create word
+          </Button>
+        )}
       </Stack>
 
       <TextField
@@ -94,6 +114,11 @@ export function DictionaryPage() {
           )}
         </Stack>
       )}
+
+      <CreateDictionaryWordDialog
+        open={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+      />
     </Stack>
   );
 }
