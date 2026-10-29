@@ -1,6 +1,9 @@
+import type { UserRole } from "./profile.types.js";
+
 export interface AuthUser {
   id: string;
   email: string;
+  role: UserRole;
 }
 
 export interface AuthSession {

@@ -1,6 +1,11 @@
-import { supabase, createAuthSupabaseClient } from "../db/supabase.js";
+import {
+  supabase,
+  supabaseAdmin,
+  createAuthSupabaseClient,
+} from "../db/supabase.js";
 import { AppError } from "../errors/AppError.js";
 import { mapAuthError } from "../errors/mapAuthError.js";
+import { getUserRole } from "./profile.service.js";
 
 import type {
   AuthResponse,
@@ -20,7 +25,9 @@ interface LoginData {
   password: string;
 }
 
-const formatUser = (user: { id: string; email?: string }): AuthUser => {
+const formatUser = async (
+  user: { id: string; email?: string },
+): Promise<AuthUser> => {
   if (!user.email) {
     throw new AppError("User email is missing", 500);
   }
@@ -28,6 +35,7 @@ const formatUser = (user: { id: string; email?: string }): AuthUser => {
   return {
     id: user.id,
     email: user.email,
+    role: await getUserRole(supabaseAdmin, user.id),
   };
 };
 
@@ -80,7 +88,7 @@ export const registerUser = async ({
   }
 
   return {
-    user: formatUser(data.user),
+    user: await formatUser(data.user),
     session: formatSession(data.session),
   };
 };
@@ -104,7 +112,7 @@ export const loginUser = async ({
   }
 
   return {
-    user: formatUser(data.user),
+    user: await formatUser(data.user),
     session: formatSession(data.session),
   };
 };
@@ -140,7 +148,7 @@ export const refreshUser = async (
   }
 
   return {
-    user: formatUser(data.user),
+    user: await formatUser(data.user),
     session: formatSession(data.session),
   };
 };

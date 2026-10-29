@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { AppError } from "../errors/AppError.js";
-import type { Profile } from "../types/profile.types.js";
+import type { Profile, UserRole } from "../types/profile.types.js";
 
 interface UpdateProfileData {
   username?: string;
@@ -28,6 +28,31 @@ export const getProfile = async (
   }
 
   return data;
+};
+
+export const getUserRole = async (
+  client: SupabaseClient,
+  userId: string,
+): Promise<UserRole> => {
+  const { data, error } = await client
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") {
+      throw new AppError("Profile not found", 404);
+    }
+
+    throw error;
+  }
+
+  if (data.role !== "admin" && data.role !== "user") {
+    throw new AppError("Invalid profile role", 500);
+  }
+
+  return data.role;
 };
 
 export const updateProfile = async (
