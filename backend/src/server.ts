@@ -15,6 +15,7 @@ import translationsRouter from "./routes/translations.routes.js";
 import reviewsRouter from "./routes/reviews.routes.js";
 import collectionsRouter from "./routes/collections.routes.js";
 import statsRouter from "./routes/stats.routes.js";
+import partsOfSpeechRouter from "./routes/parts-of-speech.routes.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -40,6 +41,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/words", wordsRouter);
 app.use("/api/user-words", userWordsRoutes);
 app.use("/api/languages", languagesRouter);
+app.use("/api/parts-of-speech", partsOfSpeechRouter);
 app.use("/api/definitions", definitionsRouter);
 app.use("/api/examples", examplesRouter);
 app.use("/api/translations", translationsRouter);

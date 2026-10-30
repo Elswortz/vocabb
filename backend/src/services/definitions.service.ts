@@ -38,3 +38,65 @@ export const createDefinition = async (
 
   return data;
 };
+
+export const updateDefinition = async (
+  id: number,
+  changes: {
+    part_of_speech_id?: number;
+    definition?: string;
+  },
+) => {
+  const { data, error } = await supabaseAdmin
+    .from("definitions")
+    .update(changes)
+    .eq("id", id)
+    .select(
+      `
+      id,
+      word_id,
+      part_of_speech_id,
+      definition,
+      created_at,
+      parts_of_speech (
+        id,
+        name
+      )
+    `,
+    )
+    .maybeSingle();
+
+  if (error) {
+    if (error.code === "23503") {
+      throw new AppError("Part of speech not found", 404);
+    }
+
+    throw error;
+  }
+
+  if (!data) {
+    throw new AppError("Definition not found", 404);
+  }
+
+  return data;
+};
+
+export const deleteDefinition = async (id: number): Promise<void> => {
+  const { data, error } = await supabaseAdmin
+    .from("definitions")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    if (error.code === "23503") {
+      throw new AppError("Cannot delete definition while it has examples", 409);
+    }
+
+    throw error;
+  }
+
+  if (!data) {
+    throw new AppError("Definition not found", 404);
+  }
+};

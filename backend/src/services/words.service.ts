@@ -86,6 +86,7 @@ export const getWordById = async (id: number) => {
 
       definitions (
         id,
+        part_of_speech_id,
         definition,
         created_at,
 
@@ -189,6 +190,10 @@ export const deleteWord = async (id: number): Promise<void> => {
     .maybeSingle();
 
   if (error) {
+    if (error.code === "23503") {
+      throw new AppError("Cannot delete word while it is in use", 409);
+    }
+
     throw error;
   }
 
